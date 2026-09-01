@@ -14,16 +14,15 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.jacksonsouza.financas",
-      "edgeToEdgeEnabled": true
+      "package": "com.jacksonsouza.financas"
     },
     "plugins": [
       "expo-router",
       "expo-sqlite",
-      "expo-notifications"
+      "expo-notifications",
+      "expo-font"
     ],
     "scheme": "financas",
-    "newArchEnabled": true,
     "experiments": {
       "typedRoutes": true
     },
