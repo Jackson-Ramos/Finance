@@ -39,3 +39,12 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# projeto
+.expo/
+dist/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+coverage/
