@@ -59,3 +59,27 @@ export function usePainelSaude(anoMes: AnoMes = anoMesAtual()): {
     };
   }, [anoMes]);
 }
+
+/**
+ * Despesas por categoria de UM mês, para a rosca do painel.
+ *
+ * Existe separado do `usePainelSaude` porque a tela Principal não precisa dos
+ * doze meses de leitura que aquele hook faz — seria pagar a conta da tela de
+ * saúde inteira para desenhar uma rosca.
+ *
+ * `limite` sai de `LIMITE_FATIAS`: a paleta validada tem três slots que passam
+ * em todos os pares, e o resto vai para a fatia "Outras".
+ */
+export function useDistribuicaoDoMes(
+  anoMes: AnoMes,
+  limite: number,
+): { fatias: FatiaCategoria[]; total: number; erro: string | null } {
+  const { dados, erro } = useConsulta(() => {
+    const lancamentos = repoLancamentos.listarPorMeses([anoMes]);
+    const categorias = repoCategorias.listar({ incluirArquivadas: true });
+    const fatias = distribuicaoPorCategoria(lancamentos, anoMes, categorias, limite);
+    return { fatias, total: fatias.reduce((soma, f) => soma + f.valor, 0) };
+  }, [anoMes, limite]);
+
+  return { fatias: dados?.fatias ?? [], total: dados?.total ?? 0, erro };
+}

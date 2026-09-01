@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Stack } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FolhaRecorrencia } from '../../components/FolhaRecorrencia';
+import { FolhaRecorrencia } from './FolhaRecorrencia';
 import {
   useAcoesRecorrencia,
   useCategoriasDespesa,
   useListaRecorrencias,
   type Recorrencia,
-} from '../../hooks/useRecorrencias';
-import { anoMesAtual, diaDoMesGrampeado, diasNoMes } from '../../lib/date';
-import { formatarDataCurta, formatarMoedaComSinal } from '../../lib/format';
-import { cores, corDoTipo, espaco, raio, REGUA, tipografia } from '../../lib/tema';
+} from '../hooks/useRecorrencias';
+import { anoMesAtual, diaDoMesGrampeado, diasNoMes } from '../lib/date';
+import { formatarDataCurta, formatarMoedaComSinal } from '../lib/format';
+import { cores, corDoTipo, espaco, raio, tipografia } from '../lib/tema';
 
 /**
  * Recorrências — as contas que se repetem todo mês.
@@ -19,8 +17,7 @@ import { cores, corDoTipo, espaco, raio, REGUA, tipografia } from '../../lib/tem
  * Cada linha é uma REGRA, não um lançamento. O app carimba um lançamento em
  * aberto por mês a partir dela, sempre no dia escolhido.
  */
-export default function TelaRecorrencias() {
-  const insets = useSafeAreaInsets();
+export function PainelRecorrencias() {
   const { dados, erro: erroLeitura } = useListaRecorrencias();
   const categorias = useCategoriasDespesa();
   const acoes = useAcoesRecorrencia();
@@ -38,12 +35,10 @@ export default function TelaRecorrencias() {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
-      <View style={[estilos.tela, { paddingTop: insets.top }]}>
+      <View style={estilos.tela}>
         <ScrollView
           contentContainerStyle={[estilos.conteudo, { paddingBottom: 120 }]}
         >
-          <Text style={estilos.titulo}>Recorrências</Text>
           <Text style={estilos.subtitulo}>
             Ao abrir o app, cada recorrência ativa ganha um lançamento em aberto no mês corrente.
             Rodar de novo não duplica.
@@ -163,8 +158,8 @@ function Linha({
         accessibilityLabel={`${recorrencia.descricao}, dia ${recorrencia.diaDoMes}. Tocar para editar.`}
         style={estilos.linhaToque}
       >
-        <View style={[estilos.dia, { borderColor: ativa ? cor : cores.regua }]}>
-          <Text style={[estilos.diaNumero, { color: ativa ? cor : cores.tintaFraca }]}>
+        <View style={[estilos.dia, { borderColor: ativa ? cor : cores.contorno }]}>
+          <Text style={[estilos.diaNumero, { color: ativa ? cor : cores.textoFraco }]}>
             {recorrencia.diaDoMes}
           </Text>
         </View>
@@ -181,7 +176,7 @@ function Linha({
           ) : null}
         </View>
 
-        <Text style={[estilos.valor, { color: ativa ? cor : cores.tintaFraca }]}>
+        <Text style={[estilos.valor, { color: ativa ? cor : cores.textoFraco }]}>
           {formatarMoedaComSinal(recorrencia.valorPrevisto, recorrencia.tipo)}
         </Text>
       </Pressable>
@@ -201,15 +196,15 @@ function Linha({
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.papel },
+  tela: { flex: 1, backgroundColor: cores.fundo },
   conteudo: { paddingHorizontal: espaco.lg },
-  titulo: { ...tipografia.mes, fontSize: 18, letterSpacing: 1.6, marginTop: espaco.lg },
-  subtitulo: { ...tipografia.apoio, color: cores.tintaFraca, marginTop: espaco.sm },
+  titulo: { ...tipografia.titulo, fontSize: 18, letterSpacing: 1.6, marginTop: espaco.lg },
+  subtitulo: { ...tipografia.apoio, color: cores.textoFraco, marginTop: espaco.sm },
   erro: { ...tipografia.apoio, color: cores.saida, marginTop: espaco.md },
 
   vazio: { alignItems: 'center', gap: espaco.sm, paddingVertical: espaco.xxl },
-  vazioTitulo: { ...tipografia.corpo, color: cores.tintaMedia },
-  vazioTexto: { ...tipografia.apoio, color: cores.tintaFraca, textAlign: 'center' },
+  vazioTitulo: { ...tipografia.corpo, color: cores.textoMedio },
+  vazioTexto: { ...tipografia.apoio, color: cores.textoFraco, textAlign: 'center' },
 
   grupo: { marginTop: espaco.xl },
   grupoCabecalho: {
@@ -219,20 +214,20 @@ const estilos = StyleSheet.create({
     marginBottom: espaco.sm,
   },
   grupoTitulo: tipografia.etiqueta,
-  grupoLinha: { flex: 1, height: REGUA, backgroundColor: cores.regua },
+  grupoLinha: { flex: 1, height: 1, backgroundColor: cores.contorno },
 
   linha: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: espaco.sm,
-    backgroundColor: cores.folha,
+    backgroundColor: cores.superficie,
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    borderWidth: 1,
+    borderColor: cores.contorno,
     paddingRight: espaco.md,
     marginBottom: espaco.sm,
   },
-  linhaPausada: { backgroundColor: cores.papelFundo },
+  linhaPausada: { backgroundColor: cores.superficieBaixa },
   linhaToque: {
     flex: 1,
     flexDirection: 'row',
@@ -248,20 +243,20 @@ const estilos = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  diaNumero: { ...tipografia.numeroLinha, fontSize: 14 },
+  diaNumero: { ...tipografia.valor, fontSize: 14 },
   textos: { flex: 1, gap: 2 },
   descricao: tipografia.corpo,
-  legenda: { ...tipografia.apoio, fontSize: 11, color: cores.tintaFraca },
-  valor: tipografia.numeroLinha,
+  legenda: { ...tipografia.apoio, fontSize: 11, color: cores.textoFraco },
+  valor: tipografia.valor,
 
   selo: {
     paddingHorizontal: espaco.sm,
     paddingVertical: espaco.xs,
     borderRadius: raio.sm,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    borderWidth: 1,
+    borderColor: cores.contorno,
   },
-  seloTexto: { ...tipografia.etiqueta, fontSize: 9, color: cores.tintaFraca },
+  seloTexto: { ...tipografia.etiqueta, fontSize: 9, color: cores.textoFraco },
 
   botaoFlutuante: {
     position: 'absolute',
@@ -271,13 +266,13 @@ const estilos = StyleSheet.create({
     borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: cores.tinta,
+    backgroundColor: cores.texto,
     elevation: 6,
-    shadowColor: cores.tinta,
+    shadowColor: cores.texto,
     shadowOpacity: 0.25,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
   },
-  botaoPressionado: { backgroundColor: cores.tintaMedia },
-  botaoGlifo: { fontSize: 30, lineHeight: 34, color: cores.papel },
+  botaoPressionado: { backgroundColor: cores.textoMedio },
+  botaoGlifo: { fontSize: 30, lineHeight: 34, color: cores.fundo },
 });

@@ -1,20 +1,18 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Stack } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FolhaLancamento } from '../../components/FolhaLancamento';
-import { FolhaObjetivo } from '../../components/FolhaObjetivo';
-import { TrilhaDupla } from '../../components/TrilhaDupla';
-import { useAcoesLancamento, useCategoriasAtivas, useMesStore } from '../../hooks/useMes';
+import { FolhaLancamento } from './FolhaLancamento';
+import { FolhaObjetivo } from './FolhaObjetivo';
+import { TrilhaDupla } from './TrilhaDupla';
+import { useAcoesLancamento, useCategoriasAtivas, useMesStore } from '../hooks/useMes';
 import {
   useAcoesObjetivo,
   useObjetivosAtivos,
   usePainelObjetivos,
   type Objetivo,
-} from '../../hooks/useObjetivos';
-import { formatarData, formatarMesAnoCurto, formatarMoeda, formatarPercentual } from '../../lib/format';
-import { cores, espaco, raio, REGUA, tipografia } from '../../lib/tema';
-import type { ProgressoObjetivo } from '../../services/progressoObjetivos';
+} from '../hooks/useObjetivos';
+import { formatarData, formatarMesAnoCurto, formatarMoeda, formatarPercentual } from '../lib/format';
+import { cores, espaco, raio, tipografia } from '../lib/tema';
+import type { ProgressoObjetivo } from '../services/progressoObjetivos';
 
 /**
  * Objetivos — quanto já foi guardado, e quando chega no alvo mantendo o ritmo.
@@ -22,8 +20,7 @@ import type { ProgressoObjetivo } from '../../services/progressoObjetivos';
  * A trilha é a mesma da tela do mês, com os papéis trocados: o contorno é o
  * ALVO, o preenchimento é o GUARDADO. Continua sendo "o todo e a parte".
  */
-export default function TelaObjetivos() {
-  const insets = useSafeAreaInsets();
+export function PainelObjetivos() {
   const anoMes = useMesStore((s) => s.anoMes);
 
   const { dados, erro: erroLeitura } = usePainelObjetivos(anoMes);
@@ -52,12 +49,10 @@ export default function TelaObjetivos() {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
-      <View style={[estilos.tela, { paddingTop: insets.top }]}>
+      <View style={estilos.tela}>
         <ScrollView
           contentContainerStyle={[estilos.conteudo, { paddingBottom: 120 }]}
         >
-          <Text style={estilos.titulo}>Objetivos</Text>
           <Text style={estilos.subtitulo}>
             Guardado é o que já foi aportado e pago. A previsão usa o ritmo médio desde o primeiro
             aporte — parar de guardar empurra a data.
@@ -243,47 +238,47 @@ function Detalhe({
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.papel },
+  tela: { flex: 1, backgroundColor: cores.fundo },
   conteudo: { paddingHorizontal: espaco.lg },
-  titulo: { ...tipografia.mes, fontSize: 18, letterSpacing: 1.6, marginTop: espaco.lg },
-  subtitulo: { ...tipografia.apoio, color: cores.tintaFraca, marginTop: espaco.sm },
+  titulo: { ...tipografia.titulo, fontSize: 18, letterSpacing: 1.6, marginTop: espaco.lg },
+  subtitulo: { ...tipografia.apoio, color: cores.textoFraco, marginTop: espaco.sm },
   erro: { ...tipografia.apoio, color: cores.saida, marginTop: espaco.md },
 
   totalCaixa: {
     marginTop: espaco.lg,
     paddingVertical: espaco.md,
-    borderTopWidth: REGUA,
-    borderBottomWidth: REGUA,
-    borderColor: cores.regua,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: cores.contorno,
   },
   totalEtiqueta: tipografia.etiqueta,
-  totalValor: { ...tipografia.numeroHeroi, fontSize: 26, marginTop: espaco.xs },
+  totalValor: { ...tipografia.saldoHeroi, fontSize: 26, marginTop: espaco.xs },
 
   vazio: { alignItems: 'center', gap: espaco.sm, paddingVertical: espaco.xxl },
-  vazioTitulo: { ...tipografia.corpo, color: cores.tintaMedia },
-  vazioTexto: { ...tipografia.apoio, color: cores.tintaFraca, textAlign: 'center' },
+  vazioTitulo: { ...tipografia.corpo, color: cores.textoMedio },
+  vazioTexto: { ...tipografia.apoio, color: cores.textoFraco, textAlign: 'center' },
 
   cartao: {
     marginTop: espaco.lg,
     padding: espaco.lg,
-    backgroundColor: cores.folha,
+    backgroundColor: cores.superficie,
     borderRadius: raio.lg,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    borderWidth: 1,
+    borderColor: cores.contorno,
   },
-  cartaoPausado: { backgroundColor: cores.papelFundo },
+  cartaoPausado: { backgroundColor: cores.superficieBaixa },
   cartaoTopo: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   cartaoNome: { ...tipografia.corpo, flex: 1 },
-  cartaoPercentual: { ...tipografia.numeroLinha, fontSize: 14 },
-  guardado: { ...tipografia.numeroHeroi, fontSize: 28, marginTop: espaco.sm },
+  cartaoPercentual: { ...tipografia.valor, fontSize: 14 },
+  guardado: { ...tipografia.saldoHeroi, fontSize: 28, marginTop: espaco.sm },
   trilhaLinha: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: espaco.sm,
     marginTop: espaco.sm,
   },
-  alvo: tipografia.numeroApoio,
-  regua: { height: REGUA, backgroundColor: cores.regua, marginVertical: espaco.md },
+  alvo: tipografia.valorApoio,
+  regua: { height: 1, backgroundColor: cores.contorno, marginVertical: espaco.md },
 
   detalheLinha: {
     flexDirection: 'row',
@@ -292,9 +287,9 @@ const estilos = StyleSheet.create({
     gap: espaco.sm,
     marginBottom: espaco.xs,
   },
-  detalhe: { ...tipografia.apoio, fontSize: 11, color: cores.tintaFraca, flexShrink: 1 },
-  detalheValor: { ...tipografia.numeroApoio, color: cores.tintaMedia },
-  detalheValorDestaque: { color: cores.tinta, fontSize: 14 },
+  detalhe: { ...tipografia.apoio, fontSize: 11, color: cores.textoFraco, flexShrink: 1 },
+  detalheValor: { ...tipografia.valorApoio, color: cores.textoMedio },
+  detalheValorDestaque: { color: cores.texto, fontSize: 14 },
   selo: { ...tipografia.etiqueta, color: cores.entrada },
 
   aportar: {
@@ -302,10 +297,10 @@ const estilos = StyleSheet.create({
     paddingVertical: espaco.sm,
     alignItems: 'center',
     borderRadius: raio.md,
-    borderWidth: REGUA,
+    borderWidth: 1,
     borderColor: cores.aporte,
   },
-  aportarPressionado: { backgroundColor: cores.aporteFraca },
+  aportarPressionado: { backgroundColor: cores.aporteFundo },
   aportarTexto: { ...tipografia.etiqueta, color: cores.aporte },
 
   botaoFlutuante: {
@@ -316,13 +311,13 @@ const estilos = StyleSheet.create({
     borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: cores.tinta,
+    backgroundColor: cores.texto,
     elevation: 6,
-    shadowColor: cores.tinta,
+    shadowColor: cores.texto,
     shadowOpacity: 0.25,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
   },
-  botaoPressionado: { backgroundColor: cores.tintaMedia },
-  botaoGlifo: { fontSize: 30, lineHeight: 34, color: cores.papel },
+  botaoPressionado: { backgroundColor: cores.textoMedio },
+  botaoGlifo: { fontSize: 30, lineHeight: 34, color: cores.fundo },
 });

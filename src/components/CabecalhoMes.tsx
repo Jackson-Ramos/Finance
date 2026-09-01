@@ -1,8 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { anoMesAtual } from '../lib/date';
 import { formatarMesAno } from '../lib/format';
-import { cores, espaco, tipografia } from '../lib/tema';
+import { ALVO_TOQUE, cores, espaco, tipografia } from '../lib/tema';
 import type { AnoMes } from '../types/dominio';
+import { Icone, type NomeIcone } from './ui/Icone';
 
 /**
  * Navegação entre meses. O nome do mês é um botão: toca e volta para hoje.
@@ -22,7 +23,7 @@ export function CabecalhoMes({
 
   return (
     <View style={estilos.linha}>
-      <Seta rotulo="Mês anterior" glifo="‹" aoTocar={aoVoltar} />
+      <Seta rotulo="Mês anterior" icone="anterior" aoTocar={aoVoltar} />
 
       <Pressable
         onPress={aoVoltarParaHoje}
@@ -37,17 +38,17 @@ export function CabecalhoMes({
         {noMesCorrente ? null : <Text style={estilos.voltar}>voltar para hoje</Text>}
       </Pressable>
 
-      <Seta rotulo="Próximo mês" glifo="›" aoTocar={aoAvancar} />
+      <Seta rotulo="Próximo mês" icone="seguinte" aoTocar={aoAvancar} />
     </View>
   );
 }
 
 function Seta({
-  glifo,
+  icone,
   rotulo,
   aoTocar,
 }: {
-  glifo: string;
+  icone: NomeIcone;
   rotulo: string;
   aoTocar: () => void;
 }) {
@@ -59,7 +60,7 @@ function Seta({
       hitSlop={12}
       style={({ pressed }) => [estilos.seta, pressed && estilos.setaPressionada]}
     >
-      <Text style={estilos.setaGlifo}>{glifo}</Text>
+      <Icone nome={icone} tamanho={22} cor={cores.textoMedio} />
     </Pressable>
   );
 }
@@ -74,24 +75,19 @@ const estilos = StyleSheet.create({
     paddingBottom: espaco.md,
   },
   centro: { alignItems: 'center', flex: 1 },
-  mes: tipografia.mes,
+  mes: tipografia.titulo,
   voltar: {
     ...tipografia.apoio,
     fontSize: 11,
-    color: cores.tintaFraca,
+    color: cores.textoFraco,
     marginTop: 2,
   },
   seta: {
-    width: 36,
-    height: 36,
+    width: ALVO_TOQUE,
+    height: ALVO_TOQUE,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
+    borderRadius: ALVO_TOQUE / 2,
   },
-  setaPressionada: { backgroundColor: cores.papelFundo },
-  setaGlifo: {
-    fontSize: 26,
-    lineHeight: 30,
-    color: cores.tintaMedia,
-  },
+  setaPressionada: { backgroundColor: cores.superficieBaixa },
 });

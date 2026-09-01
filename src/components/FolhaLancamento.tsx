@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { anoMesDe, deDate, hoje, paraDate, primeiroDia } from '../lib/date';
 import { formatarCabecalhoDia, formatarMoeda, ROTULO_TIPO } from '../lib/format';
 import { digitarCentavos, type Centavos } from '../lib/money';
-import { cores, corDoTipo, espaco, raio, REGUA, tipografia } from '../lib/tema';
+import { cores, corDoTipo, espaco, raio, tipografia } from '../lib/tema';
 import type { Categoria } from '../repositories/categorias';
 
 /** O mínimo que a folha precisa saber de um objetivo. */
@@ -216,7 +216,7 @@ export function FolhaLancamento({
 
           <View style={[estilos.valorCaixa, { borderBottomColor: cor }]}>
             <Text
-              style={[estilos.valor, { color: valor === 0 ? cores.tintaFraca : cor }]}
+              style={[estilos.valor, { color: valor === 0 ? cores.textoFraco : cor }]}
               numberOfLines={1}
               adjustsFontSizeToFit
               accessibilityLabel={`Valor ${formatarMoeda(valor)}`}
@@ -231,7 +231,7 @@ export function FolhaLancamento({
             onFocus={() => setDigitandoTexto(true)}
             onBlur={() => setDigitandoTexto(false)}
             placeholder="Descrição (opcional)"
-            placeholderTextColor={cores.tintaFraca}
+            placeholderTextColor={cores.textoFraco}
             style={estilos.descricao}
             returnKeyType="done"
             maxLength={80}
@@ -382,7 +382,7 @@ function Alternador({
       onPress={aoTocar}
       accessibilityRole="switch"
       accessibilityState={{ checked: ativo }}
-      style={[estilos.alternador, ativo && { borderColor: cor, backgroundColor: cores.folha }]}
+      style={[estilos.alternador, ativo && { borderColor: cor, backgroundColor: cores.superficie }]}
     >
       <Text style={[estilos.alternadorTexto, ativo && { color: cor }]}>
         {ativo ? rotuloAtivo : rotuloInativo}
@@ -394,7 +394,7 @@ function Alternador({
 const estilos = StyleSheet.create({
   veu: { flex: 1, backgroundColor: cores.veu },
   folha: {
-    backgroundColor: cores.papel,
+    backgroundColor: cores.fundo,
     borderTopLeftRadius: raio.folha,
     borderTopRightRadius: raio.folha,
     maxHeight: '92%',
@@ -404,7 +404,7 @@ const estilos = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: cores.reguaForte,
+    backgroundColor: cores.contorno,
   },
 
   // No RN o padrão de flexShrink é 0: sem isto a rolagem estoura a folha.
@@ -421,12 +421,12 @@ const estilos = StyleSheet.create({
     paddingVertical: espaco.sm,
     alignItems: 'center',
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
-    backgroundColor: cores.folha,
+    borderWidth: 1,
+    borderColor: cores.contorno,
+    backgroundColor: cores.superficie,
   },
-  tipoTexto: { ...tipografia.etiqueta, color: cores.tintaMedia },
-  tipoTextoAtivo: { color: cores.folha },
+  tipoTexto: { ...tipografia.etiqueta, color: cores.textoMedio },
+  tipoTextoAtivo: { color: cores.superficie },
 
   valorCaixa: {
     marginHorizontal: espaco.lg,
@@ -435,7 +435,7 @@ const estilos = StyleSheet.create({
     borderBottomWidth: 2,
     alignItems: 'flex-end',
   },
-  valor: { ...tipografia.numeroHeroi, fontSize: 40 },
+  valor: { ...tipografia.visorDigitacao, fontSize: 40 },
 
   descricao: {
     ...tipografia.corpo,
@@ -443,10 +443,10 @@ const estilos = StyleSheet.create({
     marginTop: espaco.md,
     paddingVertical: espaco.sm,
     paddingHorizontal: espaco.md,
-    backgroundColor: cores.folha,
+    backgroundColor: cores.superficie,
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    borderWidth: 1,
+    borderColor: cores.contorno,
   },
 
   chips: { gap: espaco.sm, paddingHorizontal: espaco.lg, paddingVertical: espaco.md },
@@ -454,19 +454,19 @@ const estilos = StyleSheet.create({
     paddingHorizontal: espaco.md,
     paddingVertical: espaco.sm,
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
-    backgroundColor: cores.folha,
+    borderWidth: 1,
+    borderColor: cores.contorno,
+    backgroundColor: cores.superficie,
   },
-  chipTexto: { ...tipografia.apoio, color: cores.tinta },
+  chipTexto: { ...tipografia.apoio, color: cores.texto },
   dica: {
     ...tipografia.apoio,
     fontSize: 11,
-    color: cores.tintaFraca,
+    color: cores.textoFraco,
     paddingHorizontal: espaco.lg,
     paddingTop: espaco.md,
   },
-  chipTextoAtivo: { color: cores.folha },
+  chipTextoAtivo: { color: cores.superficie },
 
   opcoes: {
     flexDirection: 'row',
@@ -481,23 +481,23 @@ const estilos = StyleSheet.create({
     gap: espaco.sm,
     paddingHorizontal: espaco.md,
     paddingVertical: espaco.xs,
-    backgroundColor: cores.folha,
+    backgroundColor: cores.superficie,
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    borderWidth: 1,
+    borderColor: cores.contorno,
   },
-  dataSeta: { fontSize: 20, color: cores.tintaMedia, lineHeight: 24 },
+  dataSeta: { fontSize: 20, color: cores.textoMedio, lineHeight: 24 },
   dataRotuloArea: { minWidth: 92, alignItems: 'center' },
-  dataRotulo: { ...tipografia.apoio, color: cores.tinta },
+  dataRotulo: { ...tipografia.apoio, color: cores.texto },
   alternador: {
     paddingHorizontal: espaco.md,
     paddingVertical: espaco.sm,
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
-    backgroundColor: cores.papelFundo,
+    borderWidth: 1,
+    borderColor: cores.contorno,
+    backgroundColor: cores.superficieBaixa,
   },
-  alternadorTexto: { ...tipografia.apoio, color: cores.tintaMedia },
+  alternadorTexto: { ...tipografia.apoio, color: cores.textoMedio },
 
   erro: {
     ...tipografia.apoio,

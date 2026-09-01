@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { cores, espaco, fontes, raio, REGUA } from '../lib/tema';
+import { cores, espaco, fontes, raio } from '../lib/tema';
 
 /**
  * Teclado próprio, no lugar do teclado do Android.
@@ -48,14 +48,14 @@ export function TecladoNumerico({
         style={({ pressed }) => [
           estilos.tecla,
           estilos.confirmar,
-          { backgroundColor: podeConfirmar ? corConfirmar : cores.papelFundo },
+          { backgroundColor: podeConfirmar ? corConfirmar : cores.superficieBaixa },
           pressed && estilos.pressionada,
         ]}
       >
         <Text
           style={[
             estilos.confirmarGlifo,
-            { color: podeConfirmar ? cores.folha : cores.tintaFraca },
+            { color: podeConfirmar ? cores.superficie : cores.textoFraco },
           ]}
         >
           ✓
@@ -102,18 +102,18 @@ const estilos = StyleSheet.create({
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: cores.folha,
+    backgroundColor: cores.superficie,
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    borderWidth: 1,
+    borderColor: cores.contorno,
   },
   pressionada: { opacity: 0.65 },
   teclaGlifo: {
     fontFamily: fontes.numero,
     fontSize: 22,
-    color: cores.tinta,
+    color: cores.texto,
   },
-  teclaGlifoDiscreta: { color: cores.tintaMedia, fontSize: 20 },
+  teclaGlifoDiscreta: { color: cores.textoMedio, fontSize: 20 },
   confirmar: { borderWidth: 0 },
   confirmarGlifo: { fontSize: 24, fontWeight: '700' },
 });

@@ -97,6 +97,6 @@ const estilos = StyleSheet.create({
     paddingLeft: espaco.lg,
   },
   painelConteudo: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
-  painelGlifo: { fontSize: 16, color: cores.folha },
-  painelRotulo: { ...tipografia.etiqueta, color: cores.folha },
+  painelGlifo: { fontSize: 16, color: cores.superficie },
+  painelRotulo: { ...tipografia.etiqueta, color: cores.superficie },
 });

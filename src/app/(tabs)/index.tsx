@@ -1,47 +1,33 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Link } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CabecalhoMes } from '../../components/CabecalhoMes';
-import { FolhaLancamento } from '../../components/FolhaLancamento';
-import { ListaDoMes } from '../../components/ListaDoMes';
-import { ResumoDoMes } from '../../components/ResumoDoMes';
-import {
-  useAcoesLancamento,
-  useCategoriasAtivas,
-  useDadosDoMes,
-  useMesStore,
-  type ItemDoMes,
-} from '../../hooks/useMes';
-import { useObjetivosAtivos } from '../../hooks/useObjetivos';
-import { formatarMesAno } from '../../lib/format';
-import { cores, espaco, REGUA, tipografia } from '../../lib/tema';
+import { RoscaCategorias } from '../../components/RoscaCategorias';
+import { Cartao, ChipIcone, Icone, PillValor, Seccao } from '../../components/ui';
+import { useDadosDoMes, useMesStore } from '../../hooks/useMes';
+import { useDistribuicaoDoMes } from '../../hooks/useSaude';
+import { formatarMoeda } from '../../lib/format';
+import { ALVO_TOQUE, cores, espaco, LIMITE_FATIAS, raio, tipografia } from '../../lib/tema';
 
 /**
- * Tela do mês — a tela principal do app.
+ * Painel do mês — a primeira tela do app.
+ *
+ * Responde a uma pergunta só: como está o mês. O detalhe de cada lançamento é
+ * assunto da aba Transações; aqui ficam o saldo, para onde o dinheiro foi, e um
+ * caminho para a leitura longa da saúde financeira.
  */
-export default function TelaDoMes() {
+export default function TelaPrincipal() {
   const insets = useSafeAreaInsets();
   const { anoMes, anterior, seguinte, voltarParaHoje } = useMesStore();
-  const { dados, erro: erroLeitura } = useDadosDoMes(anoMes);
-  const categorias = useCategoriasAtivas();
-  const objetivos = useObjetivosAtivos();
-  const acoes = useAcoesLancamento();
+  const { dados, erro } = useDadosDoMes(anoMes);
+  const { fatias, total } = useDistribuicaoDoMes(anoMes, LIMITE_FATIAS);
 
-  const [folhaAberta, setFolhaAberta] = useState(false);
-  const [emEdicao, setEmEdicao] = useState<ItemDoMes | null>(null);
+  // Não persistido de propósito: fechar o app traz os valores de volta.
+  const [oculto, setOculto] = useState(false);
 
-  function abrirNovo() {
-    acoes.limparErro();
-    setEmEdicao(null);
-    setFolhaAberta(true);
-  }
-
-  function abrirEdicao(item: ItemDoMes) {
-    acoes.limparErro();
-    setEmEdicao(item);
-    setFolhaAberta(true);
-  }
+  const resumo = dados?.resumo;
+  const saldo = resumo?.realizado.saldo ?? 0;
 
   return (
     <View style={[estilos.tela, { paddingTop: insets.top }]}>
@@ -52,107 +38,139 @@ export default function TelaDoMes() {
         aoVoltarParaHoje={voltarParaHoje}
       />
 
-      {erroLeitura ? <Text style={estilos.erro}>{erroLeitura}</Text> : null}
-
-      <ListaDoMes
-        grupos={dados?.grupos ?? []}
-        aoTocarItem={abrirEdicao}
-        aoAlternarPago={acoes.alternarPago}
-        cabecalho={
-          dados && dados.quantidade > 0 ? <ResumoDoMes resumo={dados.resumo} /> : undefined
-        }
-        rodape={
-          dados && dados.quantidade > 0 ? (
-            <Link href="/debug" style={estilos.rodapeLink}>
-              Diagnóstico do banco
-            </Link>
-          ) : null
-        }
-        mesVazio={<Vazio anoMes={anoMes} />}
-      />
-
-      <Pressable
-        onPress={abrirNovo}
-        accessibilityRole="button"
-        accessibilityLabel="Novo lançamento"
-        style={({ pressed }) => [
-          estilos.botaoFlutuante,
-          { bottom: espaco.xl },
-          pressed && estilos.botaoPressionado,
-        ]}
+      <ScrollView
+        contentContainerStyle={[estilos.conteudo, { paddingBottom: insets.bottom + espaco.xxl }]}
+        showsVerticalScrollIndicator={false}
       >
-        <Text style={estilos.botaoGlifo}>+</Text>
-      </Pressable>
+        {erro ? <Text style={estilos.erro}>{erro}</Text> : null}
 
-      <FolhaLancamento
-        visivel={folhaAberta}
-        aoFechar={() => setFolhaAberta(false)}
-        categorias={categorias}
-        objetivos={objetivos}
-        anoMes={anoMes}
-        emEdicao={emEdicao}
-        aoSalvar={acoes.salvar}
-        aoExcluir={acoes.excluir}
-        erro={acoes.erro}
-      />
-    </View>
-  );
-}
+        <Cartao>
+          <View style={estilos.heroiTopo}>
+            <Text style={estilos.heroiEtiqueta}>Saldo realizado</Text>
+            <Pressable
+              onPress={() => setOculto((v) => !v)}
+              accessibilityRole="button"
+              accessibilityLabel={oculto ? 'Mostrar valores' : 'Ocultar valores'}
+              hitSlop={12}
+              style={estilos.olho}
+            >
+              <Icone
+                nome={oculto ? 'olhoFechado' : 'olhoAberto'}
+                tamanho={20}
+                cor={cores.textoFraco}
+              />
+            </Pressable>
+          </View>
 
-function Vazio({ anoMes }: { anoMes: string }) {
-  return (
-    <View style={estilos.vazio}>
-      <Text style={estilos.vazioTitulo}>{formatarMesAno(anoMes)} está em branco</Text>
-      <Text style={estilos.vazioTexto}>
-        Toque em + para registrar o primeiro lançamento do mês.
-      </Text>
-      <Link href="/debug" style={estilos.rodapeLink}>
-        Diagnóstico do banco
-      </Link>
+          <Text
+            style={[estilos.heroiValor, saldo < 0 && { color: cores.saida }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            {oculto ? '••••••' : formatarMoeda(saldo)}
+          </Text>
+          <Text style={estilos.heroiApoio}>
+            {oculto
+              ? 'valores ocultos'
+              : `previsto para o mês ${formatarMoeda(resumo?.previsto.saldo ?? 0)}`}
+          </Text>
+
+          <View style={estilos.par}>
+            <PillValor
+              nome="entrada"
+              tom="entrada"
+              rotulo="Receitas"
+              valor={formatarMoeda(resumo?.realizado.receitas ?? 0)}
+              apoio={`de ${formatarMoeda(resumo?.previsto.receitas ?? 0)}`}
+              oculto={oculto}
+            />
+            <PillValor
+              nome="saida"
+              tom="saida"
+              rotulo="Despesas"
+              valor={formatarMoeda(resumo?.realizado.despesas ?? 0)}
+              apoio={`de ${formatarMoeda(resumo?.previsto.despesas ?? 0)}`}
+              oculto={oculto}
+            />
+          </View>
+
+          {resumo && resumo.contagem.pendentes > 0 ? (
+            <View style={estilos.pendentes}>
+              <Text style={estilos.pendentesTexto}>
+                {resumo.contagem.pendentes}{' '}
+                {resumo.contagem.pendentes === 1
+                  ? 'lançamento em aberto'
+                  : 'lançamentos em aberto'}
+              </Text>
+            </View>
+          ) : null}
+        </Cartao>
+
+        <Seccao
+          titulo="Despesas por categoria"
+          legenda="Pagas e em aberto · as três maiores, o resto em Outras"
+        >
+          <Cartao>
+            <RoscaCategorias fatias={fatias} total={total} oculto={oculto} />
+          </Cartao>
+        </Seccao>
+
+        <Seccao titulo="Ir mais fundo">
+          <Link href="/saude" asChild>
+            <Pressable
+              accessibilityRole="link"
+              accessibilityLabel="Saúde financeira"
+              style={({ pressed }) => [estilos.atalho, pressed && estilos.atalhoPressionado]}
+            >
+              <ChipIcone nome="saude" tom="acento" />
+              <View style={estilos.atalhoTexto}>
+                <Text style={estilos.atalhoTitulo}>Saúde financeira</Text>
+                <Text style={estilos.atalhoApoio}>Indicadores e os últimos 12 meses</Text>
+              </View>
+              <Icone nome="seguinte" tamanho={20} cor={cores.textoFraco} />
+            </Pressable>
+          </Link>
+        </Seccao>
+      </ScrollView>
     </View>
   );
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.papel },
-  erro: {
-    ...tipografia.apoio,
-    color: cores.saida,
-    marginHorizontal: espaco.lg,
-    marginBottom: espaco.sm,
-  },
-  vazio: {
-    alignItems: 'center',
-    gap: espaco.sm,
-    paddingHorizontal: espaco.xl,
-    paddingTop: espaco.xxl,
-  },
-  vazioTitulo: { ...tipografia.corpo, color: cores.tintaMedia },
-  vazioTexto: { ...tipografia.apoio, color: cores.tintaFraca, textAlign: 'center' },
-  rodapeLink: {
-    ...tipografia.apoio,
-    color: cores.tintaFraca,
-    textAlign: 'center',
-    padding: espaco.lg,
-  },
-  botaoFlutuante: {
-    position: 'absolute',
-    right: espaco.lg,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
+  tela: { flex: 1, backgroundColor: cores.fundo },
+  conteudo: { paddingHorizontal: espaco.lg },
+  erro: { ...tipografia.apoio, color: cores.saida, marginBottom: espaco.sm },
+
+  heroiTopo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  heroiEtiqueta: tipografia.etiqueta,
+  olho: {
+    width: ALVO_TOQUE,
+    height: ALVO_TOQUE,
+    alignItems: 'flex-end',
     justifyContent: 'center',
-    backgroundColor: cores.tinta,
-    borderWidth: REGUA,
-    borderColor: cores.tinta,
-    // Sombra discreta: o resto da tela usa régua, mas o botão precisa flutuar.
-    elevation: 6,
-    shadowColor: cores.tinta,
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
   },
-  botaoPressionado: { backgroundColor: cores.tintaMedia },
-  botaoGlifo: { fontSize: 30, lineHeight: 34, color: cores.papel },
+  heroiValor: { ...tipografia.saldoHeroi, marginTop: espaco.xs },
+  heroiApoio: { ...tipografia.apoio, fontSize: 12, marginTop: espaco.xs },
+  par: { flexDirection: 'row', gap: espaco.md, marginTop: espaco.lg },
+  pendentes: {
+    marginTop: espaco.lg,
+    paddingTop: espaco.md,
+    borderTopWidth: 1,
+    borderTopColor: cores.contorno,
+  },
+  pendentesTexto: { ...tipografia.apoio, fontSize: 12 },
+
+  atalho: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: espaco.md,
+    minHeight: ALVO_TOQUE,
+    padding: espaco.lg,
+    backgroundColor: cores.superficie,
+    borderRadius: raio.lg,
+  },
+  atalhoPressionado: { backgroundColor: cores.superficieBaixa },
+  atalhoTexto: { flex: 1 },
+  atalhoTitulo: tipografia.secao,
+  atalhoApoio: { ...tipografia.apoio, fontSize: 12, marginTop: 2 },
 });
