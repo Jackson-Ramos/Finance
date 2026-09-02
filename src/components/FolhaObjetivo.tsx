@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAlturaTeclado } from '../hooks/useTeclado';
 import { formatarMeses, formatarMoeda } from '../lib/format';
 import { digitarCentavos, dividirSeguro, type Centavos } from '../lib/money';
-import { cores, espaco, raio, REGUA, tipografia } from '../lib/tema';
+import { cores, espaco, raio, tipografia } from '../lib/tema';
 import type { DadosObjetivo, Objetivo } from '../repositories/objetivos';
 import { TecladoNumerico } from './TecladoNumerico';
 
@@ -140,7 +140,7 @@ export function FolhaObjetivo({
             onFocus={() => setDigitandoTexto(true)}
             onBlur={() => setDigitandoTexto(false)}
             placeholder="Nome do objetivo (ex.: Reserva de emergência)"
-            placeholderTextColor={cores.tintaFraca}
+            placeholderTextColor={cores.textoFraco}
             style={estilos.nome}
             returnKeyType="done"
             maxLength={60}
@@ -231,13 +231,13 @@ function CampoValor({
 const estilos = StyleSheet.create({
   veu: { flex: 1, backgroundColor: cores.veu },
   folha: {
-    backgroundColor: cores.papel,
+    backgroundColor: cores.fundo,
     borderTopLeftRadius: raio.folha,
     borderTopRightRadius: raio.folha,
     maxHeight: '92%',
   },
   puxadorArea: { alignItems: 'center', paddingVertical: espaco.md },
-  puxador: { width: 40, height: 4, borderRadius: 2, backgroundColor: cores.reguaForte },
+  puxador: { width: 40, height: 4, borderRadius: 2, backgroundColor: cores.contorno },
 
   rolagem: { flexGrow: 0, flexShrink: 1 },
   rolagemConteudo: { paddingBottom: espaco.md },
@@ -247,10 +247,10 @@ const estilos = StyleSheet.create({
     marginHorizontal: espaco.lg,
     paddingVertical: espaco.sm,
     paddingHorizontal: espaco.md,
-    backgroundColor: cores.folha,
+    backgroundColor: cores.superficie,
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    borderWidth: 1,
+    borderColor: cores.contorno,
   },
 
   campo: {
@@ -258,21 +258,21 @@ const estilos = StyleSheet.create({
     marginTop: espaco.md,
     paddingHorizontal: espaco.md,
     paddingVertical: espaco.md,
-    backgroundColor: cores.folha,
+    backgroundColor: cores.superficie,
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    borderWidth: 1,
+    borderColor: cores.contorno,
   },
   // O campo ativo é o que recebe os dígitos: borda grossa na cor de aporte.
-  campoAtivo: { borderWidth: 2, borderColor: cores.aporte, backgroundColor: cores.folha },
+  campoAtivo: { borderWidth: 2, borderColor: cores.aporte, backgroundColor: cores.superficie },
   campoRotulo: tipografia.etiqueta,
-  campoValor: { ...tipografia.numeroHeroi, fontSize: 28, textAlign: 'right', marginTop: espaco.xs },
-  campoValorVazio: { color: cores.tintaFraca },
+  campoValor: { ...tipografia.visorDigitacao, fontSize: 28, textAlign: 'right', marginTop: espaco.xs },
+  campoValorVazio: { color: cores.textoFraco },
 
   nota: {
     ...tipografia.apoio,
     fontSize: 11,
-    color: cores.tintaFraca,
+    color: cores.textoFraco,
     paddingHorizontal: espaco.lg,
     paddingTop: espaco.md,
   },

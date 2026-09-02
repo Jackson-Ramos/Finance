@@ -2,10 +2,10 @@ import { StyleSheet, Text, View } from 'react-native';
 import { formatarMesCurto, formatarMoeda, formatarPercentual } from '../lib/format';
 import {
   cores,
+  elevacao,
   coresSituacao,
   espaco,
   raio,
-  REGUA,
   rotulosSituacao,
   tipografia,
 } from '../lib/tema';
@@ -85,7 +85,7 @@ export function TiraSaldo({ serie }: { serie: readonly PontoHistorico[] }) {
         {serie.map((p, i) => {
           const altura = Math.max(2, (Math.abs(p.saldo) / maiorModulo) * METADE);
           const positivo = p.saldo >= 0;
-          const cor = p.saldo === 0 ? cores.regua : positivo ? coresSituacao.bom : coresSituacao.ruim;
+          const cor = p.saldo === 0 ? cores.contorno : positivo ? coresSituacao.bom : coresSituacao.ruim;
 
           return (
             <View
@@ -154,7 +154,7 @@ export function BarrasPorCategoria({ fatias }: { fatias: readonly FatiaCategoria
             <View
               style={[
                 estilos.categoriaBarra,
-                { width: `${Math.max(2, f.fracaoDoMaior * 100)}%`, backgroundColor: f.cor ?? cores.tintaFraca },
+                { width: `${Math.max(2, f.fracaoDoMaior * 100)}%`, backgroundColor: f.cor ?? cores.textoFraco },
               ]}
             />
           </View>
@@ -168,7 +168,7 @@ export function BarrasPorCategoria({ fatias }: { fatias: readonly FatiaCategoria
 
 /** Barra empilhada de dois (ou três) segmentos, com vão de 2px entre eles. */
 export function DivisaoGrupos({ fatias }: { fatias: readonly FatiaGrupo[] }) {
-  const coresGrupo = { CASA: '#0284C7', PESSOAL: '#B45309', SEM_GRUPO: cores.tintaFraca } as const;
+  const coresGrupo = { CASA: '#0284C7', PESSOAL: '#B45309', SEM_GRUPO: cores.textoFraco } as const;
 
   return (
     <View>
@@ -211,21 +211,20 @@ const estilos = StyleSheet.create({
     flexBasis: '47%',
     flexGrow: 1,
     padding: espaco.md,
-    backgroundColor: cores.folha,
+    backgroundColor: cores.superficie,
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    ...elevacao.cartao,
   },
   indicadorRotulo: tipografia.etiqueta,
-  indicadorValor: { ...tipografia.numeroHeroi, fontSize: 24, marginTop: espaco.xs },
+  indicadorValor: { ...tipografia.saldoHeroi, fontSize: 24, marginTop: espaco.xs },
   indicadorTrilha: { marginTop: espaco.xs },
   situacaoLinha: { flexDirection: 'row', alignItems: 'center', gap: espaco.xs, marginTop: espaco.sm },
   situacaoMarca: { width: 8, height: 8, borderRadius: 4 },
-  situacaoTexto: { ...tipografia.apoio, fontSize: 11, color: cores.tintaMedia },
+  situacaoTexto: { ...tipografia.apoio, fontSize: 11, color: cores.textoMedio },
   indicadorExplicacao: {
     ...tipografia.apoio,
     fontSize: 10,
-    color: cores.tintaFraca,
+    color: cores.textoFraco,
     marginTop: espaco.xs,
   },
 
@@ -233,24 +232,24 @@ const estilos = StyleSheet.create({
   coluna: { flex: 1, alignItems: 'center' },
   metadeSuperior: { height: METADE, justifyContent: 'flex-end', alignSelf: 'stretch', paddingHorizontal: 2 },
   metadeInferior: { height: METADE, justifyContent: 'flex-start', alignSelf: 'stretch', paddingHorizontal: 2 },
-  zero: { height: REGUA, alignSelf: 'stretch', backgroundColor: cores.reguaForte },
+  zero: { height: 1, alignSelf: 'stretch', backgroundColor: cores.contorno },
   barra: { alignSelf: 'stretch' },
   barraCima: { borderTopLeftRadius: 3, borderTopRightRadius: 3 },
   barraBaixo: { borderBottomLeftRadius: 3, borderBottomRightRadius: 3 },
-  tiraRotulo: { ...tipografia.numeroApoio, fontSize: 9, color: cores.tintaFraca, marginTop: espaco.xs },
+  tiraRotulo: { ...tipografia.valorApoio, fontSize: 9, color: cores.textoFraco, marginTop: espaco.xs },
 
   legendaTira: { flexDirection: 'row', gap: espaco.lg, marginTop: espaco.sm, flexWrap: 'wrap' },
   legendaItem: { flexDirection: 'row', alignItems: 'center', gap: espaco.xs },
   amostra: { width: 9, height: 9, borderRadius: 2 },
-  legendaTexto: { ...tipografia.apoio, fontSize: 10, color: cores.tintaFraca },
+  legendaTexto: { ...tipografia.apoio, fontSize: 10, color: cores.textoFraco },
 
   categorias: { gap: espaco.md },
   categoria: { gap: espaco.xs },
   categoriaTopo: { flexDirection: 'row', alignItems: 'baseline', gap: espaco.sm },
-  categoriaNome: { ...tipografia.apoio, color: cores.tinta, flex: 1 },
-  categoriaValor: tipografia.numeroApoio,
-  categoriaPercentual: { ...tipografia.numeroApoio, color: cores.tintaFraca, minWidth: 34, textAlign: 'right' },
-  categoriaTrilho: { height: 8, borderRadius: 4, backgroundColor: cores.papelFundo, overflow: 'hidden' },
+  categoriaNome: { ...tipografia.apoio, color: cores.texto, flex: 1 },
+  categoriaValor: tipografia.valorApoio,
+  categoriaPercentual: { ...tipografia.valorApoio, color: cores.textoFraco, minWidth: 34, textAlign: 'right' },
+  categoriaTrilho: { height: 8, borderRadius: 4, backgroundColor: cores.superficieBaixa, overflow: 'hidden' },
   categoriaBarra: { height: 8, borderRadius: 4 },
 
   empilhada: { flexDirection: 'row', height: 14, marginBottom: espaco.md },
@@ -259,6 +258,6 @@ const estilos = StyleSheet.create({
   grupo: { gap: 2 },
   grupoTopo: { flexDirection: 'row', alignItems: 'center', gap: espaco.xs },
   grupoRotulo: tipografia.etiqueta,
-  grupoValor: tipografia.numeroLinha,
-  grupoPercentual: { ...tipografia.numeroApoio, fontSize: 11, color: cores.tintaFraca },
+  grupoValor: tipografia.valor,
+  grupoPercentual: { ...tipografia.valorApoio, fontSize: 11, color: cores.textoFraco },
 });

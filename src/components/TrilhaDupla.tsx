@@ -56,7 +56,7 @@ const estilos = StyleSheet.create({
   trilha: {
     height: ALTURA_TRILHA,
     borderRadius: ALTURA_TRILHA / 2,
-    backgroundColor: cores.papelFundo,
+    backgroundColor: cores.superficieBaixa,
     overflow: 'hidden',
   },
   preenchimento: {

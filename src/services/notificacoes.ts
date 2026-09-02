@@ -5,12 +5,23 @@
  * é do serviço puro `planoNotificacoes.ts`; aqui só há permissão, canal e
  * agendamento.
  *
- * ATENÇÃO — por que o módulo é carregado por `require` dentro de try/catch:
- * no Expo Go do Android, a partir do SDK 53, importar `expo-notifications`
- * LANÇA na avaliação do módulo, não na chamada de função. Um `import` no topo
- * derruba tudo que estiver acima na cadeia — inclusive o layout raiz — e o app
- * nem monta. Carregando sob demanda, o Expo Go roda sem avisos e o development
- * build roda com eles.
+ * ATENÇÃO — por que o ambiente é checado ANTES do `require`, e não com um
+ * try/catch em volta dele:
+ *
+ * No Expo Go do Android, a partir do SDK 53, importar `expo-notifications`
+ * LANÇA na avaliação do módulo, não na chamada de função: o índice reexporta
+ * `DevicePushTokenAutoRegistration.fx`, que chama `addPushTokenListener` no
+ * escopo do módulo, e essa função lança quando é Expo Go + Android. Um
+ * `import` no topo derruba tudo que estiver acima na cadeia — inclusive o
+ * layout raiz — e o app nem monta.
+ *
+ * Só que o try/catch NÃO segura essa exceção. Este `require` é preguiçoso: sai
+ * de um callback, não da avaliação de outro módulo. Nesse caminho quem executa
+ * a fábrica é o `guardedLoadModule` do Metro, que engole o erro, reporta como
+ * fatal (a tela vermelha) e devolve `undefined` em vez de relançar — o `catch`
+ * nunca roda e `modulo` fica `undefined`, que não é `null`. A única defesa que
+ * funciona é não chegar a chamar o `require`. O try/catch fica como rede para
+ * os outros ambientes.
  *
  * Estratégia de agendamento: cancelar tudo e reagendar a partir do plano
  * completo. Reconciliar diferenças daria mais trabalho e mais bugs; a lista tem
@@ -19,6 +30,7 @@
  * Nada disto faz chamada de rede — é tudo alarme local do Android.
  */
 
+import { isRunningInExpoGo } from 'expo';
 import { Platform } from 'react-native';
 import { deDate, hoje } from '../lib/date';
 import * as repoLancamentos from '../repositories/lancamentos';
@@ -36,6 +48,10 @@ export const CANAL_VENCIMENTOS = 'vencimentos';
 let modulo: ModuloNotificacoes | null | undefined;
 let motivo: string | null = null;
 
+const MOTIVO_EXPO_GO =
+  'O Expo Go do Android não traz o expo-notifications desde o SDK 53. ' +
+  'Rode um development build para ter os avisos.';
+
 /**
  * Carrega o `expo-notifications` uma única vez, tolerando ambiente que não o
  * suporta. `require` em vez de `import()` porque precisa ser síncrono e o
@@ -43,10 +59,21 @@ let motivo: string | null = null;
  */
 function carregarModulo(): ModuloNotificacoes | null {
   if (modulo !== undefined) return modulo;
+
+  // A checagem tem que vir antes do require — ver o ATENÇÃO no topo. Mesma
+  // condição que o próprio expo-notifications usa para lançar.
+  if (Platform.OS === 'android' && isRunningInExpoGo()) {
+    modulo = null;
+    motivo = MOTIVO_EXPO_GO;
+    return modulo;
+  }
+
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    modulo = require('expo-notifications') as ModuloNotificacoes;
-    motivo = null;
+    // `?? null` porque o guarda do Metro devolve `undefined` quando engole um
+    // erro de carga, e `undefined` aqui significaria "ainda não tentei".
+    modulo = (require('expo-notifications') as ModuloNotificacoes | undefined) ?? null;
+    motivo = modulo ? null : 'expo-notifications não carregou neste ambiente';
   } catch (erro) {
     modulo = null;
     motivo = erro instanceof Error ? erro.message : String(erro);

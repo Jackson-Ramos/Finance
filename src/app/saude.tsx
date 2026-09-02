@@ -1,24 +1,25 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CabecalhoMes } from '../../components/CabecalhoMes';
-import { GraficoReceita } from '../../components/GraficoReceita';
+import { CabecalhoMes } from '../components/CabecalhoMes';
+import { CabecalhoPilha, Cartao, Seccao } from '../components/ui';
+import { GraficoReceita } from '../components/GraficoReceita';
 import {
   BarrasPorCategoria,
   CartaoIndicador,
   DivisaoGrupos,
   TiraSaldo,
-} from '../../components/GraficosSaude';
-import { useMesStore } from '../../hooks/useMes';
-import { usePainelSaude } from '../../hooks/useSaude';
-import { formatarMesCurto, formatarMeses, formatarMoeda, formatarPercentual } from '../../lib/format';
-import { cores, espaco, raio, REGUA, tipografia } from '../../lib/tema';
+} from '../components/GraficosSaude';
+import { useMesStore } from '../hooks/useMes';
+import { usePainelSaude } from '../hooks/useSaude';
+import { formatarMesCurto, formatarMeses, formatarMoeda, formatarPercentual } from '../lib/format';
+import { cores, elevacao, espaco, raio, tipografia } from '../lib/tema';
 import {
   situacaoDividas,
   situacaoFixas,
   situacaoPoupanca,
   situacaoReserva,
-} from '../../services/saudeFinanceira';
+} from '../services/saudeFinanceira';
 
 /**
  * Saúde financeira.
@@ -38,6 +39,7 @@ export default function TelaSaude() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={[estilos.tela, { paddingTop: insets.top }]}>
+        <CabecalhoPilha titulo="Saúde financeira" />
         <CabecalhoMes
           anoMes={anoMes}
           aoVoltar={anterior}
@@ -165,28 +167,26 @@ function Secao({
   children: React.ReactNode;
 }) {
   return (
-    <View style={estilos.secao}>
-      <Text style={estilos.secaoTitulo}>{titulo}</Text>
-      <Text style={estilos.secaoLegenda}>{legenda}</Text>
-      <View style={estilos.cartao}>{children}</View>
-    </View>
+    <Seccao titulo={titulo} legenda={legenda}>
+      <Cartao>{children}</Cartao>
+    </Seccao>
   );
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.papel },
+  tela: { flex: 1, backgroundColor: cores.fundo },
   conteudo: { paddingHorizontal: espaco.lg, paddingBottom: espaco.xxl },
   erro: { ...tipografia.apoio, color: cores.saida, marginBottom: espaco.md },
 
   vazio: { alignItems: 'center', gap: espaco.sm, paddingVertical: espaco.xxl },
-  vazioTitulo: { ...tipografia.corpo, color: cores.tintaMedia },
-  vazioTexto: { ...tipografia.apoio, color: cores.tintaFraca, textAlign: 'center' },
+  vazioTitulo: { ...tipografia.corpo, color: cores.textoMedio },
+  vazioTexto: { ...tipografia.apoio, color: cores.textoFraco, textAlign: 'center' },
 
   aviso: {
     ...tipografia.apoio,
     fontSize: 11,
-    color: cores.tintaMedia,
-    backgroundColor: cores.papelFundo,
+    color: cores.textoMedio,
+    backgroundColor: cores.superficieBaixa,
     padding: espaco.md,
     borderRadius: raio.md,
     marginBottom: espaco.md,
@@ -197,25 +197,12 @@ const estilos = StyleSheet.create({
   baseCaixa: {
     marginTop: espaco.lg,
     padding: espaco.lg,
-    backgroundColor: cores.folha,
+    backgroundColor: cores.superficie,
     borderRadius: raio.lg,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    ...elevacao.cartao,
   },
   baseEtiqueta: tipografia.etiqueta,
-  baseValor: { ...tipografia.numeroHeroi, fontSize: 28, marginTop: espaco.xs },
-  baseExplicacao: { ...tipografia.apoio, fontSize: 11, color: cores.tintaFraca, marginTop: espaco.sm },
-
-  secao: { marginTop: espaco.xl },
-  secaoTitulo: tipografia.etiqueta,
-  secaoLegenda: { ...tipografia.apoio, fontSize: 11, color: cores.tintaFraca, marginTop: 2 },
-  cartao: {
-    marginTop: espaco.sm,
-    padding: espaco.lg,
-    backgroundColor: cores.folha,
-    borderRadius: raio.lg,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
-  },
-  semDado: { ...tipografia.apoio, color: cores.tintaFraca, fontStyle: 'italic' },
+  baseValor: { ...tipografia.saldoHeroi, fontSize: 28, marginTop: espaco.xs },
+  baseExplicacao: { ...tipografia.apoio, fontSize: 11, color: cores.textoFraco, marginTop: espaco.sm },
+  semDado: { ...tipografia.apoio, color: cores.textoFraco, fontStyle: 'italic' },
 });

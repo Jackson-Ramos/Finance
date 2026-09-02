@@ -1,7 +1,7 @@
 import { SectionList, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from 'react-native';
 import { formatarCabecalhoDia, formatarMoeda, formatarMoedaComSinal } from '../lib/format';
-import { cores, corDoTipo, espaco, raio, REGUA, tipografia } from '../lib/tema';
+import { cores, corDoTipo, elevacao, espaco, raio, tipografia } from '../lib/tema';
 import type { GrupoDia } from '../services/agrupamento';
 import type { ItemDoMes } from '../hooks/useMes';
 import { LinhaDeslizavel } from './LinhaDeslizavel';
@@ -46,7 +46,7 @@ export function ListaDoMes({
             item.pago === 1 ? 'Reabrir' : item.tipo === 'RECEITA' ? 'Recebido' : 'Pago'
           }
           glifo={item.pago === 1 ? '↩' : '✓'}
-          cor={item.pago === 1 ? cores.tintaFraca : corDoTipo[item.tipo]}
+          cor={item.pago === 1 ? cores.textoFraco : corDoTipo[item.tipo]}
         >
           <ItemLancamento item={item} aoTocar={() => aoTocarItem(item)} />
         </LinhaDeslizavel>
@@ -58,12 +58,11 @@ export function ListaDoMes({
 }
 
 function ReguaDia({ data, saldoDoDia }: { data: string; saldoDoDia: number }) {
-  const cor = saldoDoDia < 0 ? cores.saida : saldoDoDia > 0 ? cores.entrada : cores.tintaFraca;
+  const cor = saldoDoDia < 0 ? cores.saida : saldoDoDia > 0 ? cores.entrada : cores.textoFraco;
 
   return (
     <View style={estilos.regua}>
       <Text style={estilos.reguaRotulo}>{formatarCabecalhoDia(data)}</Text>
-      <View style={estilos.reguaLinha} />
       <Text style={[estilos.reguaSaldo, { color: cor }]}>
         {saldoDoDia === 0
           ? formatarMoeda(0)
@@ -94,7 +93,7 @@ function ItemLancamento({ item, aoTocar }: { item: ItemDoMes; aoTocar: () => voi
       }. Tocar para editar.`}
       style={({ pressed }) => [estilos.item, pressed && estilos.itemPressionado]}
     >
-      <View style={[estilos.icone, { backgroundColor: item.categoriaCor ?? cores.papelFundo }]}>
+      <View style={[estilos.icone, { backgroundColor: item.categoriaCor ?? cores.superficieBaixa }]}>
         <Text style={estilos.iconeGlifo}>{item.categoriaIcone ?? '•'}</Text>
       </View>
 
@@ -110,7 +109,7 @@ function ItemLancamento({ item, aoTocar }: { item: ItemDoMes; aoTocar: () => voi
       </View>
 
       <View style={estilos.itemDireita}>
-        <Text style={[estilos.itemValor, { color: pendente ? cores.tintaMedia : cor }]}>
+        <Text style={[estilos.itemValor, { color: pendente ? cores.textoMedio : cor }]}>
           {formatarMoedaComSinal(item.valor, item.tipo)}
         </Text>
         {pendente ? <View style={[estilos.pendente, { borderColor: cor }]} /> : null}
@@ -124,15 +123,15 @@ const estilos = StyleSheet.create({
 
   regua: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
     gap: espaco.sm,
-    paddingHorizontal: espaco.lg,
+    paddingHorizontal: espaco.lg + espaco.xs,
     marginTop: espaco.lg,
     marginBottom: espaco.sm,
   },
   reguaRotulo: tipografia.etiqueta,
-  reguaLinha: { flex: 1, height: REGUA, backgroundColor: cores.regua },
-  reguaSaldo: { ...tipografia.numeroApoio, fontSize: 11 },
+  reguaSaldo: { ...tipografia.valorApoio, fontSize: 11 },
 
   item: {
     flexDirection: 'row',
@@ -141,13 +140,12 @@ const estilos = StyleSheet.create({
     marginHorizontal: espaco.lg,
     paddingHorizontal: espaco.md,
     paddingVertical: espaco.md,
-    backgroundColor: cores.folha,
-    borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    backgroundColor: cores.superficie,
+    borderRadius: raio.lg,
     marginBottom: espaco.sm,
+    ...elevacao.cartao,
   },
-  itemPressionado: { backgroundColor: cores.papelFundo },
+  itemPressionado: { backgroundColor: cores.superficieBaixa },
   icone: {
     width: 34,
     height: 34,
@@ -158,9 +156,9 @@ const estilos = StyleSheet.create({
   iconeGlifo: { fontSize: 16 },
   itemTextos: { flex: 1, gap: 2 },
   itemTitulo: tipografia.corpo,
-  itemLegenda: { ...tipografia.apoio, fontSize: 11, color: cores.tintaFraca },
+  itemLegenda: { ...tipografia.apoio, fontSize: 11, color: cores.textoFraco },
   itemDireita: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
-  itemValor: tipografia.numeroLinha,
+  itemValor: tipografia.valor,
   pendente: {
     width: 9,
     height: 9,

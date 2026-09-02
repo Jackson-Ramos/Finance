@@ -14,18 +14,24 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.jacksonsouza.financas",
-      "edgeToEdgeEnabled": true
+      "package": "com.jacksonsouza.financas"
     },
     "plugins": [
       "expo-router",
       "expo-sqlite",
-      "expo-notifications"
+      "expo-notifications",
+      "expo-font"
     ],
     "scheme": "financas",
-    "newArchEnabled": true,
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "cf4ea587-9568-4ea4-b3f4-6b891a36c260"
+      }
+    },
+    "owner": "jackson_souzza"
   }
 }

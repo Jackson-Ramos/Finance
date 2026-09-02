@@ -42,7 +42,7 @@ export function GraficoReceita({
     value: emReais(p.receitas),
     // Rótulo a cada 3 meses: doze rótulos de três letras colidiriam.
     label: i % 3 === 0 || i === ultimo ? formatarMesCurto(p.anoMes) : '',
-    frontColor: i === ultimo ? cores.tinta : cores.entrada,
+    frontColor: i === ultimo ? cores.texto : cores.entrada,
   }));
 
   const maiorReceita = Math.max(0, ...serie.map((p) => p.receitas));
@@ -57,7 +57,7 @@ export function GraficoReceita({
     <View>
       <View style={estilos.legenda}>
         <View style={estilos.legendaItem}>
-          <View style={[estilos.amostra, { backgroundColor: cores.tinta }]} />
+          <View style={[estilos.amostra, { backgroundColor: cores.texto }]} />
           <Text style={estilos.legendaTexto}>
             Mês exibido · {formatarMoeda(receitaDoMes)}
           </Text>
@@ -83,11 +83,11 @@ export function GraficoReceita({
         maxValue={maxValue}
         noOfSections={3}
         hideRules={false}
-        rulesColor={cores.regua}
+        rulesColor={cores.contorno}
         rulesThickness={1}
         yAxisThickness={0}
         xAxisThickness={1}
-        xAxisColor={cores.reguaForte}
+        xAxisColor={cores.contorno}
         yAxisTextStyle={estilos.eixo}
         xAxisLabelTextStyle={estilos.eixo}
         formatYLabel={(rotulo: string) => formatarMoedaCompacta(Number(rotulo) * 100)}
@@ -95,7 +95,7 @@ export function GraficoReceita({
         showReferenceLine1={mediaMovel !== null}
         referenceLine1Position={emReais(referencia)}
         referenceLine1Config={{
-          color: cores.tintaMedia,
+          color: cores.textoMedio,
           dashWidth: 4,
           dashGap: 4,
           thickness: 1,
@@ -114,8 +114,8 @@ const estilos = StyleSheet.create({
     height: 0,
     borderTopWidth: 1,
     borderStyle: 'dashed',
-    borderColor: cores.tintaMedia,
+    borderColor: cores.textoMedio,
   },
-  legendaTexto: { ...tipografia.apoio, fontSize: 11, color: cores.tintaMedia },
-  eixo: { fontFamily: fontes.numero, fontSize: 9, color: cores.tintaFraca },
+  legendaTexto: { ...tipografia.apoio, fontSize: 11, color: cores.textoMedio },
+  eixo: { fontFamily: fontes.numero, fontSize: 9, color: cores.textoFraco },
 });

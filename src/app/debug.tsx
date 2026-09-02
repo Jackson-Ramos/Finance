@@ -5,7 +5,7 @@ import { useAvisosAgendados } from '../hooks/useAvisos';
 import { useBootStore } from '../hooks/useBoot';
 import { useDadosDebug } from '../hooks/useDadosDebug';
 import { formatarMesAno, formatarMoeda, ROTULO_TIPO } from '../lib/format';
-import { cores, espaco, raio, REGUA, tipografia } from '../lib/tema';
+import { cores, elevacao, espaco, raio, tipografia } from '../lib/tema';
 
 /**
  * Diagnóstico do banco.
@@ -32,8 +32,14 @@ export default function TelaDebug() {
           { paddingTop: insets.top + espaco.md, paddingBottom: insets.bottom + espaco.xxl },
         ]}
       >
-        <Pressable onPress={() => router.back()} hitSlop={12} style={estilos.voltar}>
-          <Text style={estilos.voltarTexto}>‹ Voltar para o mês</Text>
+        <Pressable
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+          accessibilityRole="button"
+          accessibilityLabel="Voltar"
+          hitSlop={12}
+          style={estilos.voltar}
+        >
+          <Text style={estilos.voltarTexto}>‹ Voltar</Text>
         </Pressable>
 
         <Text style={estilos.titulo}>Diagnóstico</Text>
@@ -212,16 +218,16 @@ function Botao({
 }
 
 const estilos = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.papel },
+  tela: { flex: 1, backgroundColor: cores.fundo },
   conteudo: { paddingHorizontal: espaco.lg },
   voltar: { paddingVertical: espaco.sm, alignSelf: 'flex-start' },
-  voltarTexto: { ...tipografia.apoio, color: cores.tintaMedia },
-  titulo: { ...tipografia.mes, fontSize: 18, letterSpacing: 1.6, marginTop: espaco.sm },
-  legenda: { ...tipografia.numeroApoio, fontSize: 11, marginTop: espaco.xs },
+  voltarTexto: { ...tipografia.apoio, color: cores.textoMedio },
+  titulo: { ...tipografia.titulo, fontSize: 18, letterSpacing: 1.6, marginTop: espaco.sm },
+  legenda: { ...tipografia.valorApoio, fontSize: 11, marginTop: espaco.xs },
   erro: {
     ...tipografia.apoio,
     color: cores.saida,
-    backgroundColor: cores.saidaFraca,
+    backgroundColor: cores.saidaFundo,
     padding: espaco.md,
     borderRadius: raio.md,
     marginTop: espaco.md,
@@ -231,21 +237,20 @@ const estilos = StyleSheet.create({
     paddingHorizontal: espaco.md,
     paddingVertical: espaco.sm,
     borderRadius: raio.md,
-    backgroundColor: cores.folha,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    backgroundColor: cores.superficie,
+    borderWidth: 1,
+    borderColor: cores.contorno,
   },
-  botaoPerigo: { borderColor: cores.saidaFraca, backgroundColor: cores.saidaFraca },
+  botaoPerigo: { borderColor: cores.saidaFundo, backgroundColor: cores.saidaFundo },
   botaoPressionado: { opacity: 0.65 },
-  botaoTexto: { ...tipografia.apoio, color: cores.tinta },
+  botaoTexto: { ...tipografia.apoio, color: cores.texto },
   botaoTextoPerigo: { color: cores.saida },
   secao: { marginTop: espaco.xl },
   secaoTitulo: { ...tipografia.etiqueta, marginBottom: espaco.sm },
   cartao: {
-    backgroundColor: cores.folha,
+    backgroundColor: cores.superficie,
     borderRadius: raio.md,
-    borderWidth: REGUA,
-    borderColor: cores.regua,
+    ...elevacao.cartao,
     paddingVertical: espaco.xs,
   },
   linha: {
@@ -256,8 +261,8 @@ const estilos = StyleSheet.create({
     paddingVertical: espaco.sm,
   },
   ponto: { width: 8, height: 8, borderRadius: 4 },
-  linhaEsquerda: { ...tipografia.apoio, flex: 1, color: cores.tinta },
-  linhaDireita: { ...tipografia.numeroApoio, fontSize: 11 },
-  vazio: { ...tipografia.apoio, color: cores.tintaFraca, padding: espaco.md, fontStyle: 'italic' },
-  nota: { ...tipografia.apoio, fontSize: 11, color: cores.tintaMedia, padding: espaco.md },
+  linhaEsquerda: { ...tipografia.apoio, flex: 1, color: cores.texto },
+  linhaDireita: { ...tipografia.valorApoio, fontSize: 11 },
+  vazio: { ...tipografia.apoio, color: cores.textoFraco, padding: espaco.md, fontStyle: 'italic' },
+  nota: { ...tipografia.apoio, fontSize: 11, color: cores.textoMedio, padding: espaco.md },
 });
