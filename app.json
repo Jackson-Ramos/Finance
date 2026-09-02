@@ -32,6 +32,9 @@
         "projectId": "cf4ea587-9568-4ea4-b3f4-6b891a36c260"
       }
     },
-    "owner": "jackson_souzza"
+    "owner": "jackson_souzza",
+    "platforms": [
+      "android"
+    ]
   }
 }
